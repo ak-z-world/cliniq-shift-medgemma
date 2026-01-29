@@ -1,0 +1,91 @@
+Project name
+
+# CLINiQ-SHIFT
+
+A safety-bounded, offline clinical handoff assistant for low-resource healthcare settings
+
+Arun Kumar S
+Solo developer
+Role: Problem formulation, system design, MedGemma integration, safety evaluation, and stress testing.
+
+Problem statement
+Clinical handoffs are one of the most error-prone moments in healthcare delivery, especially in rural and low-resource settings. Nurses often document patient observations in unstructured, informal notes under fatigue, staffing shortages, and time pressure. During shift changes, critical details such as oxygen availability, IV status, pending labs, or resource constraints can be missed or miscommunicated.
+
+Many existing AI solutions assume reliable internet connectivity, centralized infrastructure, or closed models, making them unsuitable for these environments. At the same time, deploying AI systems that infer diagnoses or recommend treatments introduces unacceptable risk when clinical oversight and auditability are limited.
+
+There is a clear unmet need for a privacy-preserving, offline tool that improves continuity of care by preserving and standardizing observational information, without performing medical decision-making.
+
+Target users: Nurses and clinical staff performing shift handoffs in rural or low-resource healthcare settings.
+Improved user journey: Messy, free-text notes → clear, structured, safety-bounded handoff summary.
+
+Overall solution:
+CLINiQ-SHIFT is an offline clinical handoff standardization system built using MedGemma, a healthcare-aligned open model from Google’s Health AI Developer Foundations (HAI-DEF).
+
+Rather than attempting diagnosis or clinical reasoning, the system transforms unstructured nursing notes into a fixed, standardized handoff format that preserves observations, highlights pending tasks, and surfaces resource constraints.
+
+Why MedGemma (HAI-DEF) is essential
+
+This task requires clinical language understanding without clinical inference:
+
+Rule-based systems fail on free-text, mixed-format notes.
+
+General-purpose LLMs are prone to hallucinating diagnoses or recommendations.
+
+MedGemma’s healthcare-aligned instruction tuning enables accurate interpretation of nursing observations while maintaining conservative, factual language.
+
+Empirical validation of effective use
+
+We explicitly evaluate MedGemma’s behavior rather than relying on claims:
+
+Baseline comparison: A rule-based extractor captures only keyword mentions, while MedGemma consistently produces complete, structured handoffs.
+
+Coverage metric: MedGemma achieves full section coverage (10/10) across normal and stress-test inputs.
+
+Failure-mode discovery: Automated checks detect rare instances of implicit recommendation language.
+
+System-level safety bounding: Lightweight post-generation enforcement rewrites unsafe phrasing and re-validates outputs—without fine-tuning the model.
+
+This demonstrates that MedGemma’s strengths can be safely leveraged where simpler approaches are less effective, and that responsible deployment requires system-level controls rather than blind trust.
+
+Technical details
+Architecture (high level)
+Unstructured nursing notes
+→ Safety-constrained prompt
+→ MedGemma (offline, CPU-only)
+→ Structured handoff summary
+→ Post-generation safety validation
+
+Key technical decisions
+
+Offline execution: Designed to run fully locally for privacy and reliability in low-connectivity settings.
+
+No fine-tuning: Preserves MedGemma’s original alignment and auditability.
+
+Deterministic generation: Low-temperature decoding to avoid creative drift.
+
+Safety enforcement: Model outputs are treated as untrusted by default and checked for unsafe language.
+
+Stress testing: Evaluated on sparse, contradictory, and resource-constrained notes to ensure robustness.
+
+Failure modes considered
+Hallucinated diagnoses or recommendations → prevented via prompt constraints and safety checks
+
+Implicit recommendations (e.g., “should”) → detected and rewritten to neutral language
+
+Overconfidence with missing data → explicitly marked as “Not documented”
+
+Structural degradation → monitored via automated coverage scoring
+
+Feasibility and deployment
+CLINiQ-SHIFT is feasible as a real-world tool:
+
+Runs on commodity hardware
+
+Requires no cloud services
+
+Preserves patient privacy
+
+Integrates naturally into existing handoff workflows
+
+Summary
+CLINiQ-SHIFT demonstrates how HAI-DEF models like MedGemma can deliver real healthcare value without overreach. By focusing on information preservation, explicit uncertainty, and safety-bounded deployment, this project shows a responsible path for bringing AI out of the cloud and into the field—where care is actually delivered.
